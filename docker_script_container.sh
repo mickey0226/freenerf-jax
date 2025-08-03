@@ -1,0 +1,1 @@
+docker run -d --gpus all  -v /home/mkojima/workspace/FreeNeRF_jax:/root -v /home/mkojima/workspace/data/:/root/data  --name freenerf-jax -p 8889:8888  --shm-size 5G -it --detach-keys="ctrl-a,ctrl-q" freenerf-jax:latest
