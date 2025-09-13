@@ -176,6 +176,7 @@ class MLP(nn.Module):
   min_deg_point: int = 0  # Min degree of positional encoding for 3D points.
   max_deg_point: int = 16  # Max degree of positional encoding for 3D points.
   deg_view: int = 4  # Degree of positional encoding for viewdirs.
+  if_use_dir_enc: bool = False  # If True, use dir_enc for viewdirs.
   density_activation: Callable[Ellipsis, Any] = nn.softplus  # Density activation.
   density_noise: float = 0.  # Standard deviation of noise added to raw density.
   density_bias: float = -1.  # The shift added to raw densities pre-activation.
@@ -277,8 +278,12 @@ class MLP(nn.Module):
           jnp.maximum(jnp.sum(density_grad**2, axis=-1, keepdims=True), eps))
 
     if viewdirs is not None:
-      viewdirs_enc = mip.pos_enc(
-          viewdirs, min_deg=0, max_deg=self.deg_view, append_identity=True)
+      if self.if_use_dir_enc:
+        viewdirs_enc = mip.dir_enc(
+            viewdirs, min_deg=0, max_deg=self.deg_view, append_identity=True)
+      else:
+        viewdirs_enc = mip.pos_enc(
+            viewdirs, min_deg=0, max_deg=self.deg_view, append_identity=True)
       # Output of the first part of MLP.
       ## ------------- apply freq reg mask ------------- ##
       if viewdirs_freq_mask is not None:

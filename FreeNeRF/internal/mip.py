@@ -16,7 +16,7 @@
 """Helper functions for mip-NeRF."""
 
 import functools
-
+from scipy.special import sph_harm
 from internal import math, spacing  # pylint: disable=g-multiple-import
 import jax
 from jax import lax
@@ -34,6 +34,39 @@ def pos_enc(x, min_deg, max_deg, append_identity=True):
     return jnp.concatenate([x] + [four_feat], axis=-1)
   else:
     return four_feat
+  
+def dir_enc(x, min_deg, max_deg, append_identity=True):
+  
+  def spherical_harmonics(l, m, theta, phi):
+    return jnp.real(sph_harm(m, l, theta, phi)), jnp.imag(sph_harm(m, l, theta, phi))
+  
+  def cartesian_to_spherical(x, y, z):
+    r = jnp.sqrt(x**2 + y**2 + z**2)
+    theta = jnp.arccos(jnp.where(r != 0, z / r, 0.0))
+    phi = jnp.arctan2(y, x)
+    return theta, phi
+  
+  ls = jnp.array([2**i for i in range(min_deg, max_deg)])
+  theta, phi = cartesian_to_spherical(x[...,0], x[...,1], x[...,2])
+  
+  sh_all = None
+  for l in ls:
+    for m in range(-l, l+1):
+      Y_lm_real, Y_lm_imag = spherical_harmonics(l, m, theta, phi)
+      
+      if m == 0:
+        sh = jnp.sqrt(4.0 * jnp.pi / (2.0 * l + 1.0)) * Y_lm_real[..., None]
+      else:
+        sh = jnp.sqrt(4.0 * jnp.pi / (2.0 * l + 1.0)) * jnp.concatenate([Y_lm_real[..., None], Y_lm_imag[..., None]], axis=-1)
+
+      if sh_all is None:
+        sh_all = sh
+      else:
+        sh_all = jnp.concatenate([sh_all, sh], axis=-1)
+  if append_identity:
+    return jnp.concatenate([x] + [sh_all], axis=-1)
+  else:
+    return sh_all
 
 
 def expected_sin(x, x_var, compute_var=False):
