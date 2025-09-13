@@ -112,6 +112,7 @@ class Config:
   llff_scan: str = 'fern'  # Which LLFF scan to use.
   blender_scene: str = 'lego'  # Which blender scene to use.
   dtu_mask_path: str = None  # DTU mask data directory.
+  if_use_dir_enc: bool = False  # Whether to use direction encoding.
 
   # New loss function weights
   depth_tvnorm_loss_mult: float = 0.0  # Loss weight of depth tv norm.

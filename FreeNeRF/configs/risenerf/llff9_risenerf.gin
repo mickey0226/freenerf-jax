@@ -13,6 +13,7 @@ Config.near = 0
 Config.far = 1
 Config.factor = 8
 Config.render_factor = 8
+Config.if_use_dir_enc = True
 MipNerfModel.ray_shape = 'cylinder'
 MLP.density_noise = 1.
 MLP.deg_view = 5

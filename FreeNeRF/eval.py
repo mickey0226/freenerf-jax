@@ -119,9 +119,14 @@ def main(unused_argv):
   if config.freq_reg:
     # Rendering is forced to be deterministic even if training was randomized, as
     # this eliminates 'speckle' artifacts.
-    freq_reg_mask = (
-      math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio),
-      math.get_freq_reg_mask(27, step, config.freq_reg_end, config.max_vis_freq_ratio))
+    if config.if_use_dir_enc:
+      freq_reg_mask = (
+        math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio),
+        math.get_freq_reg_mask(132, step, config.freq_reg_end, config.max_vis_freq_ratio))
+    else:
+      freq_reg_mask = (
+        math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio),
+        math.get_freq_reg_mask(27, step, config.freq_reg_end, config.max_vis_freq_ratio))
     def render_eval_fn(variables, _, rays):
       return jax.lax.all_gather(
           model.apply(

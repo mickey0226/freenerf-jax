@@ -347,9 +347,14 @@ def main(unused_argv):
   for step, batch in zip(range(init_step, config.max_steps + 1), pdataset):
     ## ---- a tricky way to use freq_reg_mask ------------- ##
     if config.freq_reg:
-      batch['freq_reg_mask'] = (
-        math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)),
-        math.get_freq_reg_mask(27, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)))
+      if config.if_use_dir_enc:
+        batch['freq_reg_mask'] = (
+          math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)),
+          math.get_freq_reg_mask(132, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)))
+      else:
+        batch['freq_reg_mask'] = (
+          math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)),
+          math.get_freq_reg_mask(27, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)))
     ## ------------------------------------------- ##
 
     learning_rate = math.learning_rate_decay(
@@ -463,7 +468,12 @@ def main(unused_argv):
     if config.train_render_every > 0 and step % config.train_render_every == 0:
       if config.freq_reg:
         ## -- re-defining the rendering eval function to use current freq_reg_mask -- ##
-        freq_reg_mask = (
+        if config.if_use_dir_enc:
+          freq_reg_mask = (
+          math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio),
+          math.get_freq_reg_mask(132, step, config.freq_reg_end, config.max_vis_freq_ratio))
+        else:
+          freq_reg_mask = (
           math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio),
           math.get_freq_reg_mask(27, step, config.freq_reg_end, config.max_vis_freq_ratio))
         def render_eval_fn(variables, _, rays):

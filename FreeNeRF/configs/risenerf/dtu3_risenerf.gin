@@ -14,6 +14,7 @@ Config.near = 0.5
 Config.far = 3.5
 Config.factor = 4
 Config.render_factor = 4
+Config.if_use_dir_enc = True
 MLP.density_noise = 1.
 MLP.deg_view = 5
 MLP.if_use_dir_enc = True
