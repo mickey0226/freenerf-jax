@@ -1262,7 +1262,7 @@ class DTU(Dataset):
       # Load projection matrix from file.
       # fname = path.join(self.data_dir, f'../../cal18/pos_{i:03d}.txt')
       fname = path.join(self.data_dir,
-                        f'../../Calibration/cal18/pos_{i:03d}.txt')
+                        f'../../SampleSet/MVSData/Calibration/cal18/pos_{i:03d}.txt')
       with utils.open_file(fname, 'rb') as f:
         projection = np.loadtxt(f, dtype=np.float32)
 

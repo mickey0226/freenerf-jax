@@ -1,4 +1,4 @@
-
+cd /root/FreeNeRF
 method=freenerf
 num_shots=3
 scans=horns
