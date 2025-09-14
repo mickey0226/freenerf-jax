@@ -17,6 +17,7 @@
 import jax
 import jax.numpy as jnp
 import numpy as np
+from scipy.special import lambertw
 
 
 def matmul(a, b):
@@ -311,6 +312,31 @@ def get_freq_reg_mask(pos_enc_length, current_iter, total_reg_iter, max_visible=
     freq_mask[: int(pos_enc_length * max_visible)] = 1.0
     return jnp.array(freq_mask)
   
+def get_freq_reg_mask_dir(pos_enc_length, current_iter, total_reg_iter, max_visible=None):
+  
+  def get_deg_view(pos_enc_length):
+    C = float(pos_enc_length)
+    ln2 = np.log(2)
+    k = (C - 1) / 2
+    lambert_arg = ln2 * 2**(k + 2)
+    w = lambertw(lambert_arg).real
+    n = k - w / ln2
+    return int(n+1)
+    
+  t = current_iter
+  T = total_reg_iter
+  N = get_deg_view(pos_enc_length)
+  
+  if max_visible is None:
+    if current_iter < total_reg_iter:
+      freq_mask = np.ones(3,)
+      for i in range(N):
+          calc = (N*t-i*T) / T * np.ones(2**(i+2)+2,)
+          calc = np.clip(calc, 0, 1)
+          freq_mask = np.concatenate([freq_mask, calc], axis=-1)
+  return jnp.clip(jnp.array(freq_mask), 1e-8, 1-1e-8)
+      
+      
   
 def lossfun_occ_reg(rgb, density, reg_range=10, wb_prior=False, wb_range=20):
     '''
