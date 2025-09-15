@@ -350,7 +350,7 @@ def main(unused_argv):
       if config.if_use_dir_enc:
         batch['freq_reg_mask'] = (
           math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)),
-          math.get_freq_reg_mask_dir(137, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)))
+          math.get_freq_reg_mask_dir(68, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)))
       else:
         batch['freq_reg_mask'] = (
           math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio).tile((batch['rays'].origins.shape[0], 1)),
@@ -471,7 +471,7 @@ def main(unused_argv):
         if config.if_use_dir_enc:
           freq_reg_mask = (
           math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio),
-          math.get_freq_reg_mask_dir(137, step, config.freq_reg_end, config.max_vis_freq_ratio))
+          math.get_freq_reg_mask_dir(68, step, config.freq_reg_end, config.max_vis_freq_ratio))
         else:
           freq_reg_mask = (
           math.get_freq_reg_mask(99, step, config.freq_reg_end, config.max_vis_freq_ratio),

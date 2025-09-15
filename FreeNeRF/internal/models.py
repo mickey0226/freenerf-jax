@@ -65,7 +65,7 @@ class MipNerfModel(nn.Module):
     mlp = MLP()
     ## --- FreeNeRF add-on -------- ##
     if not self.config.freq_reg:
-      freq_reg_mask = (jnp.ones(99), jnp.ones(137))
+      freq_reg_mask = (jnp.ones(99), jnp.ones(68))
     else:
       freq_reg_mask = freq_reg_mask
     t_to_s, s_to_t = mip.construct_ray_warps(None, rays.near, rays.far)
@@ -158,7 +158,7 @@ def construct_mipnerf(rng, rays, config):
   if config.if_use_dir_enc:
     init_variables = model.init(
         rng, rng=None, rays=ray, resample_padding=0., compute_extras=False,
-        freq_reg_mask=(jnp.ones(99), jnp.ones(137)))
+        freq_reg_mask=(jnp.ones(99), jnp.ones(68)))
   else:
     init_variables = model.init(
         rng, rng=None, rays=ray, resample_padding=0., compute_extras=False,
@@ -286,7 +286,7 @@ class MLP(nn.Module):
     if viewdirs is not None:
       if self.if_use_dir_enc:
         viewdirs_enc = mip.dir_enc(
-            viewdirs, min_deg=0, max_deg=self.deg_view, append_identity=True)
+            viewdirs, min_deg=0, max_deg=self.deg_view)
       else:
         viewdirs_enc = mip.pos_enc(
             viewdirs, min_deg=0, max_deg=self.deg_view, append_identity=True)

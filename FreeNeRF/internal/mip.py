@@ -36,7 +36,7 @@ def pos_enc(x, min_deg, max_deg, append_identity=True):
     return four_feat
 
 @functools.partial(jax.jit, static_argnames=['min_deg', 'max_deg'])
-def dir_enc(x, min_deg, max_deg, append_identity=True):
+def dir_enc(x, min_deg, max_deg):
   
   def spherical_harmonics(l, m, theta, phi):
     return jnp.real(sph_harm(m, l, theta, phi, 2**(max_deg-1))), jnp.imag(sph_harm(m, l, theta, phi, 2**(max_deg-1)))
@@ -60,7 +60,7 @@ def dir_enc(x, min_deg, max_deg, append_identity=True):
   lms = jnp.array([(jnp.array([l]), jnp.array([m])) for l in range(min_deg, max_deg) for m in range(-2**l, 2**l+1)])
   theta, phi = cartesian_to_spherical(x[...,0], x[...,1], x[...,2])
   sh_all = jax.lax.scan(scan_sh, None, lms)[1].transpose(1,0,2).reshape(x.shape[0], -1)
-  return jnp.concatenate([x] + [sh_all], axis=-1)
+  return sh_all
 
 
 def expected_sin(x, x_var, compute_var=False):
