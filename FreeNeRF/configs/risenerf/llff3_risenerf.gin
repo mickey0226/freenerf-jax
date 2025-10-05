@@ -17,16 +17,16 @@ Config.render_factor = 8
 Config.if_use_dir_enc = True
 MipNerfModel.ray_shape = 'cylinder'
 MLP.density_noise = 1.
-MLP.deg_view = 4
+MLP.deg_view = 5
 MLP.if_use_dir_enc = True
 
 # default with regnerf's learning rate setting
 Config.lr_init = 0.002
-Config.lr_final = 0.002
+Config.lr_final = 0.00002
 Config.lr_delay_steps = 512
 Config.lr_delay_mult = 0.01
-Config.grad_max_norm = 1.0
-Config.grad_max_val = 1.0
+Config.grad_max_norm = 0.1
+Config.grad_max_val = 0.1
 
 
 # num_views dependent config

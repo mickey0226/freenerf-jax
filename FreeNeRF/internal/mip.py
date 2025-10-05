@@ -37,19 +37,18 @@ def pos_enc(x, min_deg, max_deg, append_identity=True):
 
 @functools.partial(jax.jit, static_argnames=['min_deg', 'max_deg'])
 def dir_enc(x, min_deg, max_deg):
-  
   def spherical_harmonics(l, m, theta, phi):
-    return jnp.real(sph_harm(m, l, theta, phi, 2**(max_deg-1))), jnp.imag(sph_harm(m, l, theta, phi, 2**(max_deg-1)))
+    return jnp.sqrt(4*jnp.pi/(2*l+1))*jnp.real(sph_harm(m, l, phi, theta, max_deg)), jnp.sqrt(4*jnp.pi/(2*l+1))*jnp.imag(sph_harm(m, l, phi, theta, max_deg))
   
   def cartesian_to_spherical(x, y, z):
     r = jnp.sqrt(x**2 + y**2 + z**2)
-    theta = jnp.arccos(jnp.where(r != 0, z / r, 0.0))
-    phi = jnp.arctan2(y, x)
+    theta = jnp.arccos(jnp.where(r != 0, z / r, 0.0)) #[0, pi]
+    phi = jnp.mod(jnp.arctan2(y, x), 2 * jnp.pi) #[0, 2*pi]
     return theta, phi
   
   def get_sh(l, m, theta, phi):
     Y_lm_real, Y_lm_imag = spherical_harmonics(l, m, theta, phi)
-    sh = jnp.sqrt(4.0 * jnp.pi / (2.0 * l + 1.0)) * jnp.concatenate([Y_lm_real[..., None], Y_lm_imag[..., None]], axis=-1)
+    sh = jnp.concatenate([Y_lm_real[..., None], Y_lm_imag[..., None]], axis=-1)
     return sh
   
   def scan_sh(carry, lm):
@@ -57,10 +56,12 @@ def dir_enc(x, min_deg, max_deg):
     sh = get_sh(l, m, theta, phi)
     return carry, sh
   
-  lms = jnp.array([(jnp.array([l]), jnp.array([m])) for l in range(min_deg, max_deg) for m in range(-2**l, 2**l+1)])
+  # Directional encoding with Spherical Harmonics
+  lms = jnp.array([(jnp.array([l]), jnp.array([m])) for l in range(min_deg, max_deg) for m in range(-l, l+1)])
   theta, phi = cartesian_to_spherical(x[...,0], x[...,1], x[...,2])
   sh_all = jax.lax.scan(scan_sh, None, lms)[1].transpose(1,0,2).reshape(x.shape[0], -1)
-  return sh_all
+
+  return jnp.concatenate([x, sh_all], axis=-1)
 
 
 def expected_sin(x, x_var, compute_var=False):

@@ -316,21 +316,16 @@ def get_freq_reg_mask_dir(pos_enc_length, current_iter, total_reg_iter, max_visi
   
   def get_deg_view(pos_enc_length):
     C = float(pos_enc_length)
-    ln2 = np.log(2)
-    k = (C + 2) / 2
-    lambert_arg = ln2 * 2**(k + 2)
-    w = lambertw(lambert_arg).real
-    n = k - w / ln2
-    return int(n+1)
+    return int(np.sqrt(C / 2))
     
   t = current_iter
   T = total_reg_iter
   N = get_deg_view(pos_enc_length)
   
   if max_visible is None:
-    freq_mask = np.array([])
+    freq_mask = np.ones(3,) 
     for i in range(N):
-        calc = (N*t-i*T) / T * np.ones(2**(i+2)+2,)
+        calc = (((N-1)*t-i*T) / T + 1) * np.ones(4 * i + 2,)
         calc = np.clip(calc, 0, 1)
         freq_mask = np.concatenate([freq_mask, calc], axis=-1)
   return jnp.clip(jnp.array(freq_mask), 1e-8, 1-1e-8)
