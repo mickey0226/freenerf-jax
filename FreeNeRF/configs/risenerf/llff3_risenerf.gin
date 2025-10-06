@@ -44,3 +44,7 @@ Config.occ_reg_range = 20
 Config.occ_wb_prior = False
 
 Config.load_random_rays = False
+
+# Entropy minimization loss
+Config.entropy_loss_mult = 0.001
+Config.entropy_acc_threshold = 0.1

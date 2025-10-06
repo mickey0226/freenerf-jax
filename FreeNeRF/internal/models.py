@@ -119,7 +119,7 @@ class MipNerfModel(nn.Module):
       ## ------------------------------------------------------- ##
 
       # Volumetric rendering.
-      weights, _, _, delta = mip.compute_alpha_weights(
+      weights, alpha, _, delta = mip.compute_alpha_weights(
           density, t_vals, rays.directions)
       rendering = mip.volumetric_rendering(
           rgb,
@@ -134,7 +134,7 @@ class MipNerfModel(nn.Module):
       renderings.append(rendering)
     ## --- add ray history for occlusion reg or distortion loss ----- ##
       ray_history.append(
-        {'weights': weights, 'rgb': rgb, 'density': density, 'sdist': t_to_s(t_vals)}
+        {'weights': weights, 'rgb': rgb, 'density': density, 'sdist': t_to_s(t_vals), 'alpha': alpha}
       )
     return renderings, ray_history
     ## -------------------------------------------------------------- ##

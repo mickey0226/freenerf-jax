@@ -132,6 +132,10 @@ class Config:
   depth_tvnorm_type: str = 'l2'  # Type of depth tv norm loss.
   recon_loss_scales: int = 1  # How many scales to apply reconstruction loss.
   sample_reconscale_dist: str = 'uniform_scale'  # Type of recon scale dist.
+  
+  # Entropy minimization loss
+  entropy_loss_mult: float = 0.0  # Loss weight for entropy minimization.
+  entropy_acc_threshold: float = 0.0  # Entropy accuracy threshold.
 
   # Only used by train.py:
   max_steps: int = 250000  # The number of optimization steps.
@@ -160,6 +164,7 @@ class Config:
   eval_render_interval: int = 1  # The interval between images saved to disk.
   eval_disable_lpips: bool = True  # If True, disable LPIPS computation.
   dtu_no_mask_eval: bool = False  # Set true for evaluation without masks.
+  
 
 
 def define_common_flags():

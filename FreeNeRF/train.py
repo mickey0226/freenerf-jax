@@ -184,6 +184,17 @@ def train_step(
       loss += distoration_loss
     ## --------------------------------- ##
     
+    ## entoropy minimization loss ##
+    if config.entropy_loss_mult > 0.0:
+      last_ray_results = ray_history[-1]
+      alpha = last_ray_results['alpha']
+      acc = last_ray_results['weights'].sum(-1)
+      mask = jnp.where(acc > config.entropy_acc_threshold, 1.0, 0.0)
+      normalized_alpha = alpha / (jnp.sum(alpha, axis=-1, keepdims=True) + 1e-10)
+      entropy = -jnp.sum(normalized_alpha * jnp.log2(normalized_alpha + 1e-10), axis=-1)
+      entropy_loss = config.entropy_loss_mult * jnp.mean(entropy * mask)
+      loss += entropy_loss
+    
     ## ---- if using occ reg loss ------ ##
     if config.occ_reg_loss_mult > 0.0:
       last_ray_results = ray_history[-1]
