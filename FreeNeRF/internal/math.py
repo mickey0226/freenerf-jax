@@ -315,6 +315,9 @@ def get_freq_reg_mask(pos_enc_length, current_iter, total_reg_iter, max_visible=
 def get_freq_reg_mask_dir(pos_enc_length, current_iter, total_reg_iter, max_visible=None):
   
   def get_deg_view(pos_enc_length):
+    # when max_deg = N, pos_enc_length is 2*N^2.
+    # Solve the quadratic equation to get N.
+    # if concat original direction, pos_enc_length is changed to 2*N^2 + 3. 
     C = float(pos_enc_length)
     return int(np.sqrt(C / 2))
     
@@ -323,7 +326,7 @@ def get_freq_reg_mask_dir(pos_enc_length, current_iter, total_reg_iter, max_visi
   N = get_deg_view(pos_enc_length)
   
   if max_visible is None:
-    freq_mask = np.ones(3,) 
+    freq_mask = np.array([])
     for i in range(N):
         calc = (((N-1)*t-i*T) / T + 1) * np.ones(4 * i + 2,)
         calc = np.clip(calc, 0, 1)

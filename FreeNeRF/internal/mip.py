@@ -61,7 +61,7 @@ def dir_enc(x, min_deg, max_deg):
   theta, phi = cartesian_to_spherical(x[...,0], x[...,1], x[...,2])
   sh_all = jax.lax.scan(scan_sh, None, lms)[1].transpose(1,0,2).reshape(x.shape[0], -1)
 
-  return jnp.concatenate([x, sh_all], axis=-1)
+  return sh_all
 
 
 def expected_sin(x, x_var, compute_var=False):
